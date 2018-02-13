@@ -2,6 +2,33 @@
 import scrapy
 
 
+def to_fieldname(s):
+    """ Cleanup string to use for JSON fieldname. """
+
+    import re
+
+    return re.sub(r'\W+', '', s.replace(' ', '_')).lower()
+
+
+def key_value_from_b(el):
+    """ Return key, value from <b>Key:</b> value. """
+
+    raw_key = el.css('b::text').re_first('(.*):')
+
+    if raw_key:
+        key = to_fieldname(raw_key)
+    else:
+        raise Exception('No raw key found.')
+
+    raw_value = el.xpath('./descendant-or-self::text()[position() > 1]')
+
+    if raw_value:
+        value = ''.join(raw_value.extract()).strip()
+        return key, value
+    else:
+        raise Exception('No raw value found.')
+
+
 class FicSpider(scrapy.spiders.SitemapSpider):
     name = 'fic'
     allowed_domains = ['ic.org']
@@ -16,21 +43,29 @@ class FicSpider(scrapy.spiders.SitemapSpider):
 
         fields = {}
         for field in sidebar.css('li'):
-            raw_key = field.css('b::text').re_first('(.*):')
-
-            if raw_key:
-                key = raw_key.lower().replace(' ', '_')
-            else:
-                self.logger.debug('No raw key found.')
+            try:
+                key, value = key_value_from_b(field)
+            except Exception as e:
+                self.logger.exception(e)
                 continue
 
-            raw_value = field.xpath('./descendant-or-self::text()[position() > 1]')
+            fields[key] = value
 
-            if raw_value:
-                value = ''.join(raw_value.extract()).strip()
-                fields[key] = value
-            else:
-                self.logger.debug('No raw value found.')
+        return fields
+
+    def parse_rest(self, main):
+        """ Parse remainging (lower) fields. """
+
+        rest = main.css('.listing-info-blocks')
+        fields = {}
+        for field in rest.css('ul > li'):
+            try:
+                key, value = key_value_from_b(field)
+            except Exception as e:
+                self.logger.exception(e)
+                continue
+
+            fields[key] = value
 
         return fields
 
@@ -51,6 +86,7 @@ class FicSpider(scrapy.spiders.SitemapSpider):
         fields = self.parse_main(main)
 
         fields.update(self.parse_sidebar(main))
+        fields.update(self.parse_rest(main))
 
         yield fields
 
