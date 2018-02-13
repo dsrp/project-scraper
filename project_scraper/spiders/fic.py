@@ -44,6 +44,10 @@ class FicSpider(scrapy.spiders.SitemapSpider):
 
     def parse(self, response):
         main = response.css('div.directory-listing')
+        if not main:
+            self.logger.info('Skipping %s; not a directory listing.', response)
+            return
+
         fields = self.parse_main(main)
 
         fields.update(self.parse_sidebar(main))
