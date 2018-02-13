@@ -12,25 +12,43 @@ class FicSpider(scrapy.spiders.SitemapSpider):
     ]
 
     def parse(self, response):
-        main = response.css('#main')
+        main = response.css('div.directory-listing')
+
+        sidebar = main.css('div.row.mb-2 > div.col-sm-10')
 
         yield {
             'title': main.css('h1::text').extract_first(),
-            'description': self.parse_main_text(main, 'Community Description'),
-            'mission': self.parse_main_text(main, 'Mission Statement'),
-            'status': self.parse_side_field(main, 'Status')
 
+            # Main fields
+            'description': self.main_text(main, 'Community Description'),
+            'mission': self.main_text(main, 'Mission Statement'),
+
+            # Side bar
+            'status': self.side_field(sidebar, 'Status'),
+            'started_planning': self.side_field(sidebar, 'Started Planning'),
+            'started_living': self.side_field(sidebar, 'Start Living Together'),
+            'visitors_accepted': self.side_field(sidebar, 'Visitors accepted'),
+            'new_members': self.side_field(sidebar, 'Open to new Members'),
+            'contact_name': self.side_field(sidebar, 'Contact Name'),
+            'facebook': self.side_field(sidebar, 'Facebook'),
+            'other_social': self.side_field(sidebar, 'Other social'),
+            'community_address': self.side_field(sidebar, 'Community Address'),
         }
 
-    def parse_side_field(self, main, fieldname):
+    def side_field(self, el, fieldname):
         """ Extracts fields from the right side. """
-        xpath = '//ul/li/text()[preceding::b[text()="{0}:"]]'.format(fieldname)
-        return main.xpath(xpath).extract_first().strip()
+        xpath = '*//li[b[text() = "{}:"]]/descendant-or-self::text()[position() > 1]'
+        xpath = xpath.format(fieldname)
 
-    def parse_main_text(self, main, header):
+        result = el.xpath(xpath).extract()
+
+        if result:
+            return ''.join(result).strip()
+
+    def main_text(self, el, header):
         """ Parse main header (h2) content, keeping HTML """
-        xpath = '//p[preceding::h2[text()="{0}"]]'.format(header)
+        xpath = '//p[preceding::h2[text()="{}"]]'.format(header)
 
-        text_nodes = main.xpath(xpath).extract()
+        text_nodes = el.xpath(xpath).extract()
 
         return '\n'.join(text_nodes).strip()
