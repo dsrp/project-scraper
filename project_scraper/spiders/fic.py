@@ -1,13 +1,7 @@
 # -*- coding: utf-8 -*-
 import scrapy
 
-
-def to_fieldname(s):
-    """ Cleanup string to use for JSON fieldname. """
-
-    import re
-
-    return re.sub(r'\W+', '', s.replace(' ', '_')).lower()
+from .utils import to_fieldname
 
 
 def key_value_from_b(el):
