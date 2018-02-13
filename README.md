@@ -5,3 +5,7 @@ Code for scraping communities and other interesting projects from public website
 1. Make sure you have [pipenv](https://pipenv.readthedocs.io/en/latest/) available; `pip install pipenv`
 2. Clone repo: `git clone https://github.com/dsrp/project-scraper.git` and change into project directory.
 3. Locally install dependencies: `pipenv install`
+
+## Running
+1. `pipenv shell`
+2. `scrapy crawl <fic|gen>`
