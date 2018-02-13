@@ -21,7 +21,7 @@ class FicSpider(scrapy.spiders.SitemapSpider):
             if raw_key:
                 key = raw_key.lower().replace(' ', '_')
             else:
-                self.logger.info('No raw key found.')
+                self.logger.debug('No raw key found.')
                 continue
 
             raw_value = field.xpath('./descendant-or-self::text()[position() > 1]')
@@ -30,7 +30,7 @@ class FicSpider(scrapy.spiders.SitemapSpider):
                 value = ''.join(raw_value.extract()).strip()
                 fields[key] = value
             else:
-                self.logger.info('No raw value found.')
+                self.logger.debug('No raw value found.')
 
         return fields
 
