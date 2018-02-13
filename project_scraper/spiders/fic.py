@@ -32,7 +32,7 @@ class FicSpider(scrapy.spiders.SitemapSpider):
             'contact_name': self.side_field(sidebar, 'Contact Name'),
             'facebook': self.side_field(sidebar, 'Facebook'),
             'other_social': self.side_field(sidebar, 'Other social'),
-            'community_address': self.side_field(sidebar, 'Community Address'),
+            'address': self.side_field(sidebar, 'Community Address'),
         }
 
     def side_field(self, el, fieldname):
