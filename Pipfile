@@ -9,6 +9,7 @@ name = "pypi"
 
 scrapy = "*"
 ipython = "*"
+ipdb = "*"
 
 
 [dev-packages]

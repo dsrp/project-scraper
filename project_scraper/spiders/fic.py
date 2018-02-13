@@ -14,17 +14,25 @@ class FicSpider(scrapy.spiders.SitemapSpider):
     def parse_sidebar(self, main):
         sidebar = main.css('div.row.mb-2 > div.col-sm-10')
 
-        return {
-            'status': self.side_field(sidebar, 'Status'),
-            'started_planning': self.side_field(sidebar, 'Started Planning'),
-            'started_living': self.side_field(sidebar, 'Start Living Together'),
-            'visitors_accepted': self.side_field(sidebar, 'Visitors accepted'),
-            'new_members': self.side_field(sidebar, 'Open to new Members'),
-            'contact_name': self.side_field(sidebar, 'Contact Name'),
-            'facebook': self.side_field(sidebar, 'Facebook'),
-            'other_social': self.side_field(sidebar, 'Other social'),
-            'address': self.side_field(sidebar, 'Community Address'),
-        }
+        fields = {}
+        for field in sidebar.css('li'):
+            raw_key = field.css('b::text').re_first('(.*):')
+
+            if raw_key:
+                key = raw_key.lower().replace(' ', '_')
+            else:
+                self.logger.info('No raw key found.')
+                continue
+
+            raw_value = field.xpath('./descendant-or-self::text()[position() > 1]')
+
+            if raw_value:
+                value = ''.join(raw_value.extract()).strip()
+                fields[key] = value
+            else:
+                self.logger.info('No raw value found.')
+
+        return fields
 
     def parse_main(self, main):
         return {
