@@ -87,15 +87,27 @@ class GenSpider(scrapy.spiders.SitemapSpider):
         # current_members, open to new members?, open to visitors?
         return {}
 
+    def parse_title(self, el):
+        subtitle = el.css('span.entry-subtitle ::text').extract_first()
+        if subtitle:
+            return {
+                'title': el.css(
+                    'span.entry-title-primary ::text').extract_first(),
+                'subtitle': subtitle
+            }
+
+        return {
+            'title': el.css('h1.entry-title ::text').extract_first()
+        }
+
     def parse(self, response):
         article = response.css('article.gen_project')
 
         fields = {
-            'title': article.css('span.entry-title-primary::text').extract_first(),
-            'subtitle': article.css('span.entry-subtitle::text').extract_first(),
             'description': ''.join(article.css('div.project-description > *').extract())
         }
 
+        fields.update(self.parse_title(article))
         fields.update(self.parse_meta(article))
         fields.update(self.parse_sidebar(response))
         fields.update(self.parse_members_visitors(response))
