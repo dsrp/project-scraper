@@ -1,0 +1,2 @@
+data/fic.json filter=lfs diff=lfs merge=lfs -text
+data/gen.json filter=lfs diff=lfs merge=lfs -text
