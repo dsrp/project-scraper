@@ -12,7 +12,7 @@ def key_value_from_b(el):
     if raw_key:
         key = to_fieldname(raw_key)
     else:
-        raise Exception('No raw key found.')
+        raise Exception('No raw key found in {}.'.format(el.extract()))
 
     raw_value = el.xpath('./descendant-or-self::text()[position() > 1]')
 
@@ -20,7 +20,7 @@ def key_value_from_b(el):
         value = ''.join(raw_value.extract()).strip()
         return key, value
     else:
-        raise Exception('No raw value found.')
+        raise Exception('No raw value found in {}.'.format(el.extract()))
 
 
 class FicSpider(scrapy.spiders.SitemapSpider):
@@ -40,7 +40,7 @@ class FicSpider(scrapy.spiders.SitemapSpider):
             try:
                 key, value = key_value_from_b(field)
             except Exception as e:
-                self.logger.exception(e)
+                self.logger.warning(e)
                 continue
 
             fields[key] = value
@@ -56,7 +56,7 @@ class FicSpider(scrapy.spiders.SitemapSpider):
             try:
                 key, value = key_value_from_b(field)
             except Exception as e:
-                self.logger.exception(e)
+                self.logger.warning(e)
                 continue
 
             fields[key] = value
