@@ -76,7 +76,10 @@ class GenSpider(scrapy.spiders.SitemapSpider):
 
             fields[name] = value
 
-        # TODO: coordinates?
+        fields['coordinates'] = sidebar.css(
+            'section.sidebar-info-map a::attr("href")'
+        ).re_first('/maps/place/(.*)/')
+
         return fields
 
     def parse_members_visitors(self, el):
