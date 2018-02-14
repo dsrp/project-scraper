@@ -18,14 +18,25 @@ class GenSpider(scrapy.spiders.SitemapSpider):
 
         fields = {}
         for el in el.css('div.gen-project-entry-meta > div > span'):
-            name = to_fieldname(el.css('h4::text').extract_first())
-            value = el.xpath(
-                './descendant-or-self::text()[position() > 1]'
-            ).re_first(':*\s*(.*)\s*')
+            keys = list(
+                map(to_fieldname, el.css('h4 ::text').extract())
+            )
+            values = el.xpath(
+                './h4/following-sibling::text()'
+            ).re(':*\s*(.*)\s*')
 
-            fields[name] = value
+            # Remove empty values...
+            values = [value for value in values if value]
 
-        # TODO: planned_start, other_languages
+            if len(keys) != len(values):
+                self.logger.error(
+                    'Number of values (%d) doesn\'t match keys (%d) for %s.',
+                    len(values), len(keys), el.extract()
+                )
+
+                continue
+
+            fields.update(zip(keys, values))
 
         return fields
 
@@ -65,10 +76,13 @@ class GenSpider(scrapy.spiders.SitemapSpider):
 
             fields[name] = value
 
-        # TODO: email, social media, keywords, affiliated to, region, country,
-        # address, website, coordinates?
-        # import ipdb; ipdb.set_trace()
+        # TODO: coordinates?
         return fields
+
+    def parse_members_visitors(self, el):
+        # TODO:
+        # current_members, open to new members?, open to visitors?
+        return {}
 
     def parse(self, response):
         article = response.css('article.gen_project')
@@ -81,5 +95,6 @@ class GenSpider(scrapy.spiders.SitemapSpider):
 
         fields.update(self.parse_meta(article))
         fields.update(self.parse_sidebar(response))
+        fields.update(self.parse_members_visitors(response))
 
         yield fields
