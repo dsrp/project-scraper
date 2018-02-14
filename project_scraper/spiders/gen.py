@@ -70,9 +70,9 @@ class GenSpider(scrapy.spiders.SitemapSpider):
                 value = dict(zip(keys, values))
             else:
                 # Single valued
-                value = el.xpath(
+                value = ''.join(el.xpath(
                     './descendant-or-self::text()[position() > 1]'
-                ).re_first(':*\s*(.*)\s*')
+                ).re(':*\s*(.*)\s*'))
 
             fields[name] = value
 
