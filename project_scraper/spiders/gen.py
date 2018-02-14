@@ -83,9 +83,23 @@ class GenSpider(scrapy.spiders.SitemapSpider):
         return fields
 
     def parse_members_visitors(self, el):
-        # TODO:
-        # current_members, open to new members?, open to visitors?
-        return {}
+        el = el.css('div.participation-info')
+
+        fields = {}
+
+        visitors_description = ''.join(el.css('p').extract())
+        if visitors_description:
+            fields['visitors_description'] = visitors_description
+
+        for el in el.css('li ::text'):
+            current_members = el.re_first('Current members: (.*)')
+            if current_members:
+                fields['current_members'] = current_members
+            else:
+                # Treat like boolean tag
+                fields[to_fieldname(el.extract())] = True
+
+        return fields
 
     def parse_title(self, el):
         subtitle = el.css('span.entry-subtitle ::text').extract_first()
@@ -103,8 +117,14 @@ class GenSpider(scrapy.spiders.SitemapSpider):
     def parse(self, response):
         article = response.css('article.gen_project')
 
+        if not article:
+            self.logger.info('Skipping %s; not a directory listing.', response)
+            return
+
         fields = {
-            'description': ''.join(article.css('div.project-description > *').extract())
+            'description': ''.join(
+                article.css('div.project-description > *').extract()
+            )
         }
 
         fields.update(self.parse_title(article))
