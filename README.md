@@ -1,6 +1,10 @@
 # project-scraper
 Code for scraping communities and other interesting projects from public websites.
 
+## Datasets
+* Global Ecovillage Network (GEN) [gen.json](data/gen.json)
+* Fellowship for Intentional Communities (FIC) [fic.json](data/fic.json)
+
 ## Installing
 1. Make sure you have [GIT](https://git-scm.com/downloads) and [GIT-LFS](https://git-lfs.github.com/) installed.
 2. Clone this repo: `git clone https://github.com/dsrp/project-scraper.git`.
