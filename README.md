@@ -2,6 +2,7 @@
 Code for scraping communities and other interesting projects from public websites.
 
 ## Datasets
+Readily crawled datasets live in the [data](data/) folder. Currently available are:
 * Global Ecovillage Network (GEN) [gen.json](data/gen.json)
 * Fellowship for Intentional Communities (FIC) [fic.json](data/fic.json)
 
