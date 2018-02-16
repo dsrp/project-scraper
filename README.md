@@ -1,10 +1,9 @@
 # project-scraper
 Code for scraping communities and other interesting projects from public websites.
 
-## Datasets
-Readily crawled datasets live in the [data](data/) folder. Currently available are:
-* Global Ecovillage Network (GEN) [gen.json](data/gen.json)
-* Fellowship for Intentional Communities (FIC) [fic.json](data/fic.json)
+## Project structure
+* [data](data/): extracted datasets
+* [project_scraper](project_scraper/): Scrapy project for data harvesting
 
 ## Installing
 1. Make sure you have [GIT](https://git-scm.com/downloads) and [GIT-LFS](https://git-lfs.github.com/) installed.
